@@ -1,0 +1,11 @@
+avahi-daemon.service
+cronie.service
+cups.service
+firewalld.service
+getty@.service
+NetworkManager-dispatcher.service
+NetworkManager.service
+NetworkManager-wait-online.service
+power-profiles-daemon.service
+sddm.service
+systemd-timesyncd.service

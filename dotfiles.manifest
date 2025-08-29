@@ -1,0 +1,6 @@
+nvim             -> ~/.config/nvim
+kitty            -> ~/.config/kitty
+fastfetch        -> ~/.config/fastfetch
+gtk_themes       -> ~/.themes
+tmux/.tmux.conf  -> ~/.tmux.conf
+zsh/.zshrc       -> ~/.zshrc
