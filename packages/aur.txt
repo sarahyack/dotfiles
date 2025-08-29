@@ -8,6 +8,7 @@ freetube-nightly
 gearhead
 getnf
 github-desktop
+grub-customizer
 hollywood
 huiontablet
 itch-bin

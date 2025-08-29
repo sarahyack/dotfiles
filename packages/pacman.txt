@@ -1,7 +1,6 @@
 0ad
 godot
 grub-btrfs
-grub-customizer
 grub2-theme-preview
 guvcview
 inkscape
@@ -52,7 +51,7 @@ vulkan-tools
 xed
 xournalpp
 xsensors
-# yazi? (you had "vazi" earlier—if you meant yazi, add it)
+yazi
 zsh
 zsh-autosuggestions
 zsh-completions

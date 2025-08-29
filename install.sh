@@ -59,21 +59,54 @@ ensure_yay(){
 }
 
 install_packages(){
-  mapfile -t pacman_pkgs < <(read_list "$PACMAN_LIST" || true)
-  mapfile -t aur_pkgs    < <(read_list "$AUR_LIST" || true)
+  mapfile -t pacman_in < <(read_list "$PACMAN_LIST" || true)
+  mapfile -t aur_in    < <(read_list "$AUR_LIST" || true)
 
+  # Buckets we’ll actually install
+  local pacman_pkgs=() aur_pkgs=() unknown=()
+
+  # Helper: add unique
+  add_unique(){ local -n arr=$1 x; for x in "${arr[@]}"; do [[ "$x" == "$2" ]] && return; done; arr+=("$2"); }
+
+  # Ensure yay exists before probing AUR
+  ensure_yay
+
+  # Check a name: installed? repo? aur?
+  classify(){
+    local pkg="$1"
+    # already installed?
+    if pacman -Qq "$pkg" &>/dev/null; then return 0; fi
+    # in official repos?
+    if pacman -Si "$pkg" &>/dev/null; then add_unique pacman_pkgs "$pkg"; return 0; fi
+    # in AUR?
+    if yay -Si "$pkg" &>/dev/null; then add_unique aur_pkgs "$pkg"; return 0; fi
+    unknown+=("$pkg")
+  }
+
+  # Classify everything the user put in pacman.txt (some may actually be AUR)
+  for p in "${pacman_in[@]}"; do classify "$p"; done
+  # Classify everything in aur.txt (some may actually be repo now)
+  for p in "${aur_in[@]}";    do classify "$p"; done
+
+  # Install repos first
   if ((${#pacman_pkgs[@]})); then
-    log "Installing pacman packages (missing only)…"
+    log "Installing repo packages (${#pacman_pkgs[@]})…"
     sudo pacman -S --needed --noconfirm "${pacman_pkgs[@]}"
   else
-    log "No pacman packages listed."
+    log "No new repo packages to install."
   fi
 
+  # Then AUR
   if ((${#aur_pkgs[@]})); then
-    log "Installing AUR packages with yay (missing only)…"
+    log "Installing AUR packages (${#aur_pkgs[@]})…"
     yay -S --needed --noconfirm "${aur_pkgs[@]}"
   else
-    log "No AUR packages listed."
+    log "No new AUR packages to install."
+  fi
+
+  # Warn about true unknowns (typos / retired packages)
+  if ((${#unknown[@]})); then
+    warn "These names weren’t found in repos or AUR: ${unknown[*]}"
   fi
 }
 
